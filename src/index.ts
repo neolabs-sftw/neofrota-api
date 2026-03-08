@@ -3,11 +3,9 @@ import { expressMiddleware } from "@as-integrations/express5";
 import express from "express";
 import cors from "cors";
 import cron from "node-cron";
-// import "./scheduler";
 
 import { typeDefs } from "./graphql/typeDefs";
 import { resolvers } from "./graphql/resolvers";
-import handler from "./api/cron";
 
 async function startServer() {
   const app = express();
@@ -51,22 +49,8 @@ async function startServer() {
     // A tua lógica real de vouchers ou limpeza entra aqui
   }
 
-  // Rota para teste manual ou acionamento pelo Vercel Cron
   app.get("/cron", (req, res) => {
-    try {
-      // 1. Executamos a tarefa imediatamente
-      cron
-      tarefaAutomatizada();
-
-      // 2. Respondemos ao navegador/Vercel que deu tudo certo
-      res
-        .status(200)
-        .send(
-          "Tarefa executada com sucesso às " + new Date().toLocaleTimeString(),
-        );
-    } catch (error) {
-      res.status(500).send("Erro na execução");
-    } 
+    console.log("Executando Cron",new Date().toLocaleTimeString())
   });
 
   await new Promise<any>((resolve) => {
