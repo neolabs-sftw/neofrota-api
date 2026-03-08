@@ -1,0 +1,43 @@
+{
+  "name": "neofrotaapi",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.ts",
+  "scripts": {
+    "dev": "nodemon",
+    "build": "prisma generate && tsc",
+    "start": "node dist/index.js"
+  },
+  "keywords": [],
+  "author": "Jeferson Lima",
+  "license": "ISC",
+  "packageManager": "pnpm@10.23.0",
+  "dependencies": {
+    "@apollo/server": "^5.2.0",
+    "@as-integrations/express5": "^1.1.2",
+    "@graphql-tools/load-files": "^7.0.1",
+    "@graphql-tools/merge": "^9.1.6",
+    "@prisma/adapter-pg": "^7.2.0",
+    "@prisma/client": "^7.2.0",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/pg": "^8.16.0",
+    "@vercel/node": "^5.6.11",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1",
+    "graphql": "^16.12.0",
+    "graphql-tag": "^2.12.6",
+    "jsonwebtoken": "^9.0.3",
+    "node-cron": "^4.2.1",
+    "nodemon": "^3.1.11",
+    "pg": "^8.16.3",
+    "prisma": "^7.2.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  },
+  "devDependencies": {
+    "@types/node-cron": "^3.0.11"
+  }
+}

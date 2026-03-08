@@ -1,0 +1,511 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model AdminUsuario {
+  id                   BigInt    @id @default(autoincrement())
+  operadoraId          BigInt?   @map("operadora_id")
+  nome                 String?   @map("nome") @db.VarChar(255)
+  email                String    @unique @map("email") @db.VarChar(255)
+  senha                String?   @map("senha") @db.VarChar(255)
+  fotoAdminOperadora   String?   @map("foto_admin_operadora") @db.VarChar(255)
+  statusAdminOperadora Boolean?  @default(true) @map("status_admin_operadora")
+  dataCriacao          DateTime? @default(now()) @map("data_criacao") @db.Timestamp(6)
+
+  funcao             Funcao?              @default(Oper) @map("funcao")
+  operadora          Operadora?           @relation(fields: [operadoraId], references: [id])
+  modeloVoucherFixo  ModeloVoucherFixo[]
+  modeloVoucherTurno ModeloVoucherTurno[]
+  voucher            Voucher[]
+
+  @@map("admin_usuario")
+}
+
+model CentroCustoCliente {
+  id               BigInt  @id @default(autoincrement())
+  nome             String  @map("nome") @db.VarChar(255)
+  codigo           String? @map("codigo") @db.VarChar(50)
+  empresaClienteId BigInt? @map("empresa_cliente_id")
+  operadoraId      BigInt? @map("operadora_id")
+
+  empresaCliente EmpresaCliente? @relation(fields: [empresaClienteId], references: [id])
+  operadora      Operadora?      @relation(fields: [operadoraId], references: [id])
+  passageiros    Passageiro[]
+
+  @@map("centro_custo_cliente")
+}
+
+model EmpresaCliente {
+  id              BigInt   @id @default(autoincrement())
+  rSocial         String   @map("r_social") @db.VarChar(255)
+  nome            String?  @map("nome") @db.VarChar(255)
+  cnpj            String?  @map("cnpj") @db.VarChar(20)
+  fotoLogoCliente String?  @map("foto_logo_cliente") @db.VarChar(255)
+  operadoraId     BigInt   @map("operadora_id")
+  statusCliente   Boolean? @default(true) @map("status_cliente")
+
+  centroCustoCliente    CentroCustoCliente[]
+  operadora             Operadora               @relation(fields: [operadoraId], references: [id])
+  solicitante           Solicitante[]
+  unidadeEmpresaCliente UnidadeEmpresaCliente[]
+  modeloVoucherFixo     ModeloVoucherFixo[]
+  modeloVoucherTurno    ModeloVoucherTurno[]
+  voucher               Voucher[]
+  rotaValor             RotaValor[]
+  rota                  Rota[]
+  passageiros           Passageiro[]
+
+  @@map("empresa_cliente")
+}
+
+model Motorista {
+  id              BigInt    @id @default(autoincrement())
+  nome            String    @map("nome") @db.VarChar(255)
+  email           String?   @unique @map("email") @db.VarChar(255)
+  senha           String?   @default("0000") @map("senha") @db.VarChar(255)
+  fotoMotorista   String?   @map("foto_motorista") @db.VarChar(255)
+  cpf             String?   @map("cpf") @db.VarChar(20)
+  cnh             String?   @map("cnh") @db.VarChar(20)
+  vCnh            DateTime? @map("v_cnh") @db.Timestamp(6)
+  statusMotorista Boolean?  @default(true) @map("status_motorista")
+  tipoMotorista   String?   @map("tipo_motorista") @db.VarChar(50)
+  dataCriacao     DateTime? @default(now()) @map("data_criacao") @db.Timestamp(6)
+  operadoraId     BigInt?   @map("operadora_id")
+  statusCnh       Boolean?  @default(true) @map("status_cnh")
+
+  // Relacionamentos de agregado/funcionário
+  carro                  Carro[]
+  modeloVoucherTurno     ModeloVoucherTurno[]
+  voucher                Voucher[]
+  operadora              Operadora?               @relation(fields: [operadoraId], references: [id])
+  agregadoRelacao        RelacaoAgrdFunc[]        @relation("Agregado")
+  funcionarioRelacao     RelacaoAgrdFunc[]        @relation("Funcionario")
+  configuracaoViagemFixa ConfiguracaoViagemFixa[]
+
+  @@map("motorista")
+}
+
+model Carro {
+  id          Int       @id @default(autoincrement())
+  placa       String    @unique
+  marca       String    @map("marca") @db.VarChar(50)
+  modelo      String    @map("modelo") @db.VarChar(50)
+  cor         String    @map("cor") @db.VarChar(30)
+  crlv        String    @map("crlv") @db.VarChar(50)
+  anoCrlv     DateTime? @map("ano_crlv")
+  vCrlv       Boolean?  @default(true) @map("v_crlv")
+  chassi      String    @map("chassi") @db.VarChar(50)
+  ano         String    @map("ano") @db.VarChar(4)
+  agregadoId  BigInt?   @map("agregado_id")
+  motoristaId BigInt?   @map("motorista_id")
+  operadoraId BigInt?   @map("operadora_id")
+
+  operadora              Operadora?               @relation(fields: [operadoraId], references: [id])
+  motorista              Motorista?               @relation(fields: [motoristaId], references: [id])
+  vouchers               Voucher[]
+  modeloVoucherTurno     ModeloVoucherTurno[]
+  configuracaoViagemFixa ConfiguracaoViagemFixa[]
+
+  @@map("carro")
+}
+
+model Marca {
+  id   Int    @id @default(autoincrement())
+  nome String @unique
+
+  modelo Modelo[]
+
+  @@map("marca")
+}
+
+model Modelo {
+  id      Int    @id @default(autoincrement())
+  nome    String @unique
+  marcaId Int    @map("marca_id")
+
+  marca Marca @relation(fields: [marcaId], references: [id])
+
+  @@map("modelo")
+}
+
+model Operadora {
+  id              BigInt    @id @default(autoincrement())
+  nome            String    @map("nome") @db.VarChar(255)
+  slug            String?   @unique @map("slug") @db.VarChar(100)
+  logoOperadora   String?   @map("logo_operadora") @db.VarChar(255)
+  cnpj            String?   @map("cnpj") @db.VarChar(20)
+  rSocial         String?   @map("r_social") @db.VarChar(255)
+  endRua          String?   @map("end_rua") @db.VarChar(255)
+  endNumero       String?   @map("end_numero") @db.VarChar(20)
+  endBairro       String?   @map("end_bairro") @db.VarChar(100)
+  endCep          String?   @map("end_cep") @db.VarChar(10)
+  endCidade       String?   @map("end_cidade") @db.VarChar(100)
+  endUf           String?   @map("end_uf") @db.VarChar(2)
+  statusOperadora Boolean?  @default(true) @map("status_operadora")
+  dataCriacao     DateTime? @default(now()) @map("data_criacao") @db.Timestamp(6)
+
+  adminUsuario          AdminUsuario[]
+  centroCustoCliente    CentroCustoCliente[]
+  empresaCliente        EmpresaCliente[]
+  motorista             Motorista[]
+  solicitante           Solicitante[]
+  unidadeEmpresaCliente UnidadeEmpresaCliente[]
+  rota                  Rota[]
+  rotaValor             RotaValor[]
+  modeloVoucherFixo     ModeloVoucherFixo[]
+  modeloVoucherTurno    ModeloVoucherTurno[]
+  voucher               Voucher[]
+  carro                 Carro[]
+  relacaoAgrdFunc       RelacaoAgrdFunc[]
+  pedagio               Pedagio[]
+
+  @@map("operadora")
+}
+
+model UnidadeEmpresaCliente {
+  id                   BigInt  @id @default(autoincrement())
+  nome                 String  @map("nome") @db.VarChar(255)
+  cnpj                 String? @map("cnpj") @db.VarChar(20)
+  endRua               String? @map("end_rua") @db.VarChar(255)
+  endNumero            String? @map("end_numero") @db.VarChar(20)
+  endBairro            String? @map("end_bairro") @db.VarChar(100)
+  endCidade            String? @map("end_cidade") @db.VarChar(100)
+  endCep               String? @map("end_cep") @db.VarChar(10)
+  endComplemento       String? @map("end_complemento") @db.VarChar(100)
+  endUf                String? @map("end_uf") @db.VarChar(2)
+  empresaClienteId     BigInt? @map("empresa_cliente_id")
+  operadoraId          BigInt? @map("operadora_id")
+  statusUnidadeCliente Boolean @default(true) @map("status_unidade_cliente")
+  matriz               Boolean @default(false) @map("matriz")
+
+  empresaCliente EmpresaCliente? @relation(fields: [empresaClienteId], references: [id])
+  operadora      Operadora?      @relation(fields: [operadoraId], references: [id])
+
+  vouchers           Voucher[]
+  modeloVoucherFixos ModeloVoucherFixo[]
+
+  @@map("unidade_empresa_cliente")
+}
+
+model Solicitante {
+  id                 BigInt            @id @default(autoincrement())
+  nome               String            @map("nome") @db.VarChar(255)
+  email              String            @unique @map("email") @db.VarChar(255)
+  senha              String            @default("0000") @map("senha") @db.VarChar(255)
+  empresaClienteId   BigInt            @map("empresa_cliente_id")
+  fotoUrlSolicitante String?           @map("foto_url_solicitante") @db.VarChar(255)
+  statusSolicitante  Boolean           @default(true) @map("status_solicitante")
+  operadoraId        BigInt?           @map("operadora_id")
+  telefone           String?           @map("telefone") @db.VarChar(20)
+  funcao             FuncaoSolicitante @map("funcao")
+
+  empresaCliente EmpresaCliente @relation(fields: [empresaClienteId], references: [id])
+  operadora      Operadora?     @relation(fields: [operadoraId], references: [id])
+
+  vouchers Voucher[]
+
+  @@map("solicitante")
+}
+
+model Passageiro {
+  id                   BigInt  @id @default(autoincrement())
+  nome                 String  @map("nome")
+  matricula            String? @map("matricula")
+  telefone             String? @map("telefone")
+  email                String? @unique @map("email")
+  ativo                Boolean @default(true) @map("ativo")
+  empresaClienteId     BigInt  @map("empresa_cliente_id")
+  centroCustoClienteId BigInt  @map("centro_custo_cliente_id")
+  fotoPerfilPassageiro String? @map("foto_perfil_passageiro")
+  endRua               String? @map("end_rua")
+  endNumero            String? @map("end_numero")
+  endBairro            String? @map("end_bairro")
+  endCidade            String? @map("end_cidade")
+  pontoApanha          String? @map("ponto_apanha")
+  horarioEmbarque      String? @map("horario_embarque")
+
+  empresaCliente     EmpresaCliente      @relation(fields: [empresaClienteId], references: [id])
+  centroCustoCliente CentroCustoCliente  @relation(fields: [centroCustoClienteId], references: [id])
+  viagens            VoucherPassageiro[]
+
+  @@map("passageiro")
+}
+
+model Rota {
+  id               Int     @id @default(autoincrement())
+  origem           String  @map("origem")
+  destino          String  @map("destino")
+  tributacao       String? @map("tributacao")
+  operadoraId      BigInt  @map("operadora_id")
+  empresaClienteId BigInt? @map("empresa_cliente_id")
+
+  rotaValor      RotaValor[]
+  vouchers       Voucher[]
+  operadora      Operadora?      @relation(fields: [operadoraId], references: [id])
+  empresaCliente EmpresaCliente? @relation(fields: [empresaClienteId], references: [id])
+
+  @@map("rota")
+}
+
+model Pedagio {
+  id          Int     @id @default(autoincrement())
+  nome        String  @map("nome")
+  valor       Decimal @map("valor") @db.Decimal(10, 2)
+  operadoraId BigInt  @map("operadora_id")
+
+  operadora          Operadora           @relation(fields: [operadoraId], references: [id])
+  rotaValor          RotaValor[]
+  modeloVoucherFixos ModeloVoucherFixo[]
+
+  @@map("pedagio")
+}
+
+model RotaValor {
+  id                       Int              @id @default(autoincrement())
+  rotaId                   Int              @map("rota_id")
+  empresaClienteId         BigInt?          @map("empresa_cliente_id")
+  operadoraId              BigInt?          @map("operadora_id")
+  valorViagem              Decimal          @map("valor_viagem") @db.Decimal(10, 2)
+  valorViagemRepasse       Decimal          @map("valor_viagem_repasse") @db.Decimal(10, 2)
+  valorHoraParada          Decimal          @map("valor_hora_parada") @db.Decimal(10, 2)
+  valorHoraParadaRepasse   Decimal          @map("valor_hora_parada_repasse") @db.Decimal(10, 2)
+  valorDeslocamento        Decimal          @map("valor_deslocamento") @db.Decimal(10, 2)
+  valorDeslocamentoRepasse Decimal          @map("valor_deslocamento_repasse") @db.Decimal(10, 2)
+  valorPedagio             Int?             @map("valor_pedagio")
+  categoria                CategoriasCarros
+
+  rota           Rota            @relation(fields: [rotaId], references: [id])
+  empresaCliente EmpresaCliente? @relation(fields: [empresaClienteId], references: [id])
+  operadora      Operadora?      @relation(fields: [operadoraId], references: [id])
+  pedagio        Pedagio?        @relation(fields: [valorPedagio], references: [id])
+
+  @@unique([rotaId, categoria])
+  @@map("rota_valor")
+}
+
+model ModeloVoucherFixo {
+  id         Int     @id @default(autoincrement())
+  nomeModelo String  @map("nome_modelo")
+  ativo      Boolean @default(true) @map("ativo")
+
+  // Dados de Faturamento e Hierarquia
+  empresaClienteId BigInt @map("empresa_cliente_id")
+  unidadeClienteId BigInt @map("unidade_cliente_id")
+  operadoraId      BigInt @map("operadora_id")
+  adminUsuarioId   BigInt @map("admin_usuario_id")
+
+  // Valores Base
+  // Se os valores mudarem entre entrada e saída, devem ir para a tabela de Configuração
+  valorViagem              Decimal @map("valor_viagem") @db.Decimal(10, 2)
+  valorViagemRepasse       Decimal @map("valor_viagem_repasse") @db.Decimal(10, 2)
+  valorHoraParada          Decimal @map("valor_hora_parada") @db.Decimal(10, 2)
+  valorHoraParadaRepasse   Decimal @map("valor_hora_parada_repasse") @db.Decimal(10, 2)
+  valorDeslocamento        Decimal @map("valor_deslocamento") @db.Decimal(10, 2)
+  valorDeslocamentoRepasse Decimal @map("valor_deslocamento_repasse") @db.Decimal(10, 2)
+  valorPedagio             Int?    @map("valor_pedagio")
+
+  diasSemana DiaDaSemana[] @map("dias_semana")
+
+  // Relacionamentos
+  empresaCliente  EmpresaCliente           @relation(fields: [empresaClienteId], references: [id])
+  unidadeCliente  UnidadeEmpresaCliente    @relation(fields: [unidadeClienteId], references: [id])
+  configuracoes   ConfiguracaoViagemFixa[]
+  vouchersGerados Voucher[]
+  pedagio         Pedagio?                 @relation(fields: [valorPedagio], references: [id])
+  adminUsuario    AdminUsuario             @relation(fields: [adminUsuarioId], references: [id])
+  operadora       Operadora                @relation(fields: [operadoraId], references: [id])
+
+  @@map("modelo_voucher_fixo")
+}
+
+model ConfiguracaoViagemFixa {
+  id           Int         @id @default(autoincrement())
+  modeloFixoId Int         @map("modelo_fixo_id")
+  tipo         TipoCorrida @map("tipo_corrida") // Entrada ou Saida
+
+  horario     DateTime @map("horario") @db.Time
+  origem      String
+  destino     String
+  motoristaId BigInt   @map("motorista_id")
+  carroId     Int      @map("carro_id")
+
+  modelo    ModeloVoucherFixo @relation(fields: [modeloFixoId], references: [id])
+  motorista Motorista         @relation(fields: [motoristaId], references: [id])
+  carro     Carro             @relation(fields: [carroId], references: [id])
+
+  @@unique([modeloFixoId, tipo])
+  @@map("configuracao_viagem_fixa")
+}
+
+model ModeloVoucherTurno {
+  id                         Int           @id @default(autoincrement())
+  nomeModelo                 String        @map("nome_modelo")
+  ativo                      Boolean       @default(true) @map("ativo")
+  empresaClienteId           BigInt        @map("empresa_cliente_id")
+  motoristaId                BigInt        @map("motorista_id")
+  carroId                    Int           @map("carro_id")
+  adminUsuarioId             BigInt        @map("admin_usuario_id")
+  operadoraId                BigInt        @map("operadora_id")
+  tipoCorrida                String        @map("tipo_corrida")
+  origem                     String        @map("origem")
+  destino                    String        @map("destino")
+  valorViagem                Decimal       @map("valor_viagem") @db.Decimal(10, 2)
+  valorViagemRepasse         Decimal       @map("valor_viagem_repasse") @db.Decimal(10, 2)
+  valorPedagio               Decimal       @map("valor_pedagio") @db.Decimal(10, 2)
+  valorPedagioRepasse        Decimal       @map("valor_pedagio_repasse") @db.Decimal(10, 2)
+  valorEstacionamento        Decimal       @map("valor_estacionamento") @db.Decimal(10, 2)
+  valorEstacionamentoRepasse Decimal       @map("valor_estacionamento_repasse") @db.Decimal(10, 2)
+  valorTempoParado           Decimal       @map("valor_tempo_parado") @db.Decimal(10, 2)
+  valorTempoParadoRepasse    Decimal       @map("valor_tempo_parado_repasse") @db.Decimal(10, 2)
+  dataInicio                 DateTime      @map("data_inicio")
+  dataFim                    DateTime?     @map("data_fim")
+  horario                    DateTime      @map("horario") @db.Time
+  diasSemana                 DiaDaSemana[] @map("dias_semana")
+
+  empresaCliente EmpresaCliente @relation(fields: [empresaClienteId], references: [id])
+  motorista      Motorista      @relation(fields: [motoristaId], references: [id])
+  carro          Carro          @relation(fields: [carroId], references: [id])
+  adminUsuario   AdminUsuario   @relation(fields: [adminUsuarioId], references: [id])
+  operadora      Operadora      @relation(fields: [operadoraId], references: [id])
+
+  vouchersGerados Voucher[]
+
+  @@map("modelo_voucher_turno")
+}
+
+model RelacaoAgrdFunc {
+  id            BigInt  @id @default(autoincrement())
+  agregadoId    BigInt  @map("agregado_id")
+  funcionarioId BigInt  @unique @map("funcionario_id")
+  operadoraId   BigInt? @map("operadora_id")
+
+  motoristaComoAgregado    Motorista? @relation("Agregado", fields: [agregadoId], references: [id])
+  motoristaComoFuncionario Motorista? @relation("Funcionario", fields: [funcionarioId], references: [id])
+  operadora                Operadora? @relation(fields: [operadoraId], references: [id])
+
+  @@map("relacao_agrd_func")
+}
+
+model VoucherPassageiro {
+  id                  Int            @id @default(autoincrement())
+  voucherId           Int            @map("voucher_id")
+  passageiroId        BigInt         @map("passageiro_id")
+  horarioEmbarqueReal DateTime?      @map("horario_embarque_real")
+  rateio              Decimal?       @map("rateio")
+  statusPresenca      StatusPresenca @default(Agendado) @map("status_presenca")
+
+  voucher    Voucher    @relation(fields: [voucherId], references: [id])
+  passageiro Passageiro @relation(fields: [passageiroId], references: [id])
+
+  @@unique([voucherId, passageiroId])
+  @@map("voucher_passageiro")
+}
+
+model Voucher {
+  id                       Int             @id @default(autoincrement())
+  origem                   String          @map("origem")
+  destino                  String          @map("destino")
+  dataHoraProgramado       DateTime        @map("data_hora_programado")
+  dataHoraConclusao        DateTime?       @map("data_hora_conclusao")
+  dataHoraCriacao          DateTime        @default(now()) @map("data_hora_criacao")
+  valorViagem              Decimal         @map("valor_viagem") @db.Decimal(10, 2)
+  valorViagemRepasse       Decimal         @map("valor_viagem_repasse") @db.Decimal(10, 2)
+  valorDeslocamento        Decimal         @map("valor_deslocamento") @db.Decimal(10, 2)
+  valorDeslocamentoRepasse Decimal         @map("valor_deslocamento_repasse") @db.Decimal(10, 2)
+  valorHoraParada          Decimal         @map("valor_hora_parada") @db.Decimal(10, 2)
+  valorHoraParadaRepasse   Decimal         @map("valor_hora_parada_repasse") @db.Decimal(10, 2)
+  valorEstacionamento      Decimal         @map("valor_estacionamento") @db.Decimal(10, 2)
+  valorPedagio             Decimal         @map("valor_pedagio") @db.Decimal(10, 2)
+  qntTempoParado           Int?            @map("qnt_tempo_parado")
+  assinatura               String?         @map("assinatura")
+  observacaoMotorista      String?         @map("observacao_motorista")
+  observacao               String?         @map("observacao")
+  modeloFixoId             Int?            @map("modelo_fixo_id")
+  modeloTurnoId            Int?            @map("modelo_turno_id")
+  rotaId                   Int?            @map("rota_id")
+  empresaClienteId         BigInt          @map("empresa_cliente_id")
+  unidadeClienteId         BigInt          @map("unidade_cliente_id")
+  motoristaId              BigInt          @map("motorista_id")
+  carroId                  Int             @map("carro_id")
+  solicitanteId            BigInt          @map("solicitante_id")
+  adminUsuarioId           BigInt          @map("admin_usuario_id")
+  operadoraId              BigInt          @map("operadora_id")
+  natureza                 NaturezaVoucher @map("natureza")
+  tipoCorrida              TipoCorrida     @map("tipo_corrida")
+  status                   StatusVoucher   @default(Aberto) @map("status")
+
+  modeloFixo     ModeloVoucherFixo?    @relation(fields: [modeloFixoId], references: [id])
+  modeloTurno    ModeloVoucherTurno?   @relation(fields: [modeloTurnoId], references: [id])
+  rota           Rota?                 @relation(fields: [rotaId], references: [id])
+  empresaCliente EmpresaCliente        @relation(fields: [empresaClienteId], references: [id])
+  unidadeCliente UnidadeEmpresaCliente @relation(fields: [unidadeClienteId], references: [id])
+  motorista      Motorista             @relation(fields: [motoristaId], references: [id])
+  carro          Carro                 @relation(fields: [carroId], references: [id])
+  adminUsuario   AdminUsuario          @relation(fields: [adminUsuarioId], references: [id])
+  solicitante    Solicitante           @relation(fields: [solicitanteId], references: [id])
+  operadora      Operadora             @relation(fields: [operadoraId], references: [id])
+
+  passageiros VoucherPassageiro[]
+
+  @@map("voucher")
+}
+
+enum StatusPresenca {
+  Agendado
+  Presente
+  Ausente
+}
+
+enum NaturezaVoucher {
+  Fixo
+  Extra
+  Turno
+}
+
+enum StatusVoucher {
+  Aberto
+  EmAndamento
+  Concluido
+  Cancelado
+}
+
+enum TipoCorrida {
+  Entrada
+  Saida
+}
+
+enum DiaDaSemana {
+  Domingo
+  Segunda
+  Terca
+  Quarta
+  Quinta
+  Sexta
+  Sabado
+}
+
+enum CategoriasCarros {
+  Sedan
+  MiniVan
+  Van
+  Micro
+  Onibus
+  Material
+}
+
+enum Funcao {
+  Master
+  Admin
+  Finc
+  Oper
+}
+
+enum FuncaoSolicitante {
+  Finc
+  Oper
+  Prin
+}
