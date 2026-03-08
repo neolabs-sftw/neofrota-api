@@ -50,7 +50,11 @@ async function startServer() {
   }
 
   app.get("/cron", (req, res) => {
-    console.log("Executando Cron",new Date().toLocaleTimeString())
+    try {
+      console.log("Executando Cron", new Date().toLocaleTimeString());
+    } catch (err) {
+      console.error("Não Rodou",err);
+    }
   });
 
   await new Promise<any>((resolve) => {
