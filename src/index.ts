@@ -52,7 +52,7 @@ async function startServer() {
   }
 
   // Rota para teste manual ou acionamento pelo Vercel Cron
-  app.get("/cronjob", (req, res) => {
+  app.get("/cron", (req, res) => {
     try {
       // 1. Executamos a tarefa imediatamente
       cron
