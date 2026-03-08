@@ -7,106 +7,6 @@ import { typeDefs } from "./graphql/typeDefs";
 import { resolvers } from "./graphql/resolvers";
 import { executarCriacaoVoucher } from "./api/voucher.service";
 
-const dadosExemploVoucher = {
-  origem: "Sede Central",
-  destino: "Filial Norte",
-  dataHoraProgramado: new Date(),
-  natureza: "Fixo",
-  tipoCorrida: "Entrada",
-  status: "Aberto",
-
-  // ADICIONA ESTES CAMPOS (e outros que sejam obrigatórios no teu schema)
-  valorViagem: 50.0,
-  valorViagemRepasse: 40.0,
-  valorDeslocamento: 0,
-  valorDeslocamentoRepasse: 0,
-  valorHoraParada: 0,
-  valorHoraParadaRepasse: 0,
-  valorPedagio: 0,
-  valorEstacionamento: 0,
-
-  // IDs de exemplo (certifica-te que estes IDs existem no teu DB)
-  empresaClienteId: "1",
-  unidadeClienteId: "1",
-  motoristaId: "1",
-  solicitanteId: "1",
-  adminUsuarioId: "1",
-  operadoraId: "1",
-  carroId: "1",
-
-  passageiros: [
-    { passageiroId: "1", statusPresenca: "Agendado" },
-    { passageiroId: "2", statusPresenca: "Agendado" },
-    { passageiroId: "3", statusPresenca: "Agendado" },
-  ],
-};
-const dadosExemploVoucher2 = {
-  origem: "Sede Central",
-  destino: "Filial Norte",
-  dataHoraProgramado: new Date(),
-  natureza: "Extra",
-  tipoCorrida: "Saida",
-  status: "Aberto",
-
-  // ADICIONA ESTES CAMPOS (e outros que sejam obrigatórios no teu schema)
-  valorViagem: 90.0,
-  valorViagemRepasse: 70.0,
-  valorDeslocamento: 0,
-  valorDeslocamentoRepasse: 0,
-  valorHoraParada: 0,
-  valorHoraParadaRepasse: 0,
-  valorPedagio: 0,
-  valorEstacionamento: 0,
-
-  // IDs de exemplo (certifica-te que estes IDs existem no teu DB)
-  empresaClienteId: "1",
-  unidadeClienteId: "1",
-  motoristaId: "1",
-  solicitanteId: "1",
-  adminUsuarioId: "1",
-  operadoraId: "1",
-  carroId: "1",
-
-  passageiros: [
-    { passageiroId: "3", statusPresenca: "Agendado" },
-    { passageiroId: "4", statusPresenca: "Agendado" },
-    { passageiroId: "5", statusPresenca: "Agendado" },
-  ],
-};
-const dadosExemploVoucher3 = {
-  origem: "Sede Central",
-  destino: "Filial Norte",
-  dataHoraProgramado: new Date(),
-  natureza: "Turno",
-  tipoCorrida: "Entrada",
-  status: "Aberto",
-
-  // ADICIONA ESTES CAMPOS (e outros que sejam obrigatórios no teu schema)
-  valorViagem: 150.0,
-  valorViagemRepasse: 140.0,
-  valorDeslocamento: 0,
-  valorDeslocamentoRepasse: 0,
-  valorHoraParada: 0,
-  valorHoraParadaRepasse: 0,
-  valorPedagio: 0,
-  valorEstacionamento: 0,
-
-  // IDs de exemplo (certifica-te que estes IDs existem no teu DB)
-  empresaClienteId: "1",
-  unidadeClienteId: "1",
-  motoristaId: "1",
-  solicitanteId: "1",
-  adminUsuarioId: "1",
-  operadoraId: "1",
-  carroId: "1",
-
-  passageiros: [
-    { passageiroId: "6", statusPresenca: "Agendado" },
-    { passageiroId: "7", statusPresenca: "Agendado" },
-    { passageiroId: "20", statusPresenca: "Agendado" },
-  ],
-};
-
 async function startServer() {
   const app = express();
 
@@ -143,6 +43,105 @@ async function startServer() {
   });
 
   app.get("/cron", async (req, res) => {
+    const dadosExemploVoucher = {
+      origem: "Sede Central",
+      destino: "Filial Norte",
+      dataHoraProgramado: new Date(),
+      natureza: "Fixo",
+      tipoCorrida: "Entrada",
+      status: "Aberto",
+
+      // ADICIONA ESTES CAMPOS (e outros que sejam obrigatórios no teu schema)
+      valorViagem: 50.0,
+      valorViagemRepasse: 40.0,
+      valorDeslocamento: 0,
+      valorDeslocamentoRepasse: 0,
+      valorHoraParada: 0,
+      valorHoraParadaRepasse: 0,
+      valorPedagio: 0,
+      valorEstacionamento: 0,
+
+      // IDs de exemplo (certifica-te que estes IDs existem no teu DB)
+      empresaClienteId: "1",
+      unidadeClienteId: "1",
+      motoristaId: "1",
+      solicitanteId: "1",
+      adminUsuarioId: "1",
+      operadoraId: "1",
+      carroId: "1",
+
+      passageiros: [
+        { passageiroId: "1", statusPresenca: "Agendado" },
+        { passageiroId: "2", statusPresenca: "Agendado" },
+        { passageiroId: "3", statusPresenca: "Agendado" },
+      ],
+    };
+    const dadosExemploVoucher2 = {
+      origem: "Sede Central",
+      destino: "Filial Norte",
+      dataHoraProgramado: new Date(),
+      natureza: "Extra",
+      tipoCorrida: "Saida",
+      status: "Aberto",
+
+      // ADICIONA ESTES CAMPOS (e outros que sejam obrigatórios no teu schema)
+      valorViagem: 90.0,
+      valorViagemRepasse: 70.0,
+      valorDeslocamento: 0,
+      valorDeslocamentoRepasse: 0,
+      valorHoraParada: 0,
+      valorHoraParadaRepasse: 0,
+      valorPedagio: 0,
+      valorEstacionamento: 0,
+
+      // IDs de exemplo (certifica-te que estes IDs existem no teu DB)
+      empresaClienteId: "1",
+      unidadeClienteId: "1",
+      motoristaId: "1",
+      solicitanteId: "1",
+      adminUsuarioId: "1",
+      operadoraId: "1",
+      carroId: "1",
+
+      passageiros: [
+        { passageiroId: "3", statusPresenca: "Agendado" },
+        { passageiroId: "4", statusPresenca: "Agendado" },
+        { passageiroId: "5", statusPresenca: "Agendado" },
+      ],
+    };
+    const dadosExemploVoucher3 = {
+      origem: "Sede Central",
+      destino: "Filial Norte",
+      dataHoraProgramado: new Date(),
+      natureza: "Turno",
+      tipoCorrida: "Entrada",
+      status: "Aberto",
+
+      // ADICIONA ESTES CAMPOS (e outros que sejam obrigatórios no teu schema)
+      valorViagem: 150.0,
+      valorViagemRepasse: 140.0,
+      valorDeslocamento: 0,
+      valorDeslocamentoRepasse: 0,
+      valorHoraParada: 0,
+      valorHoraParadaRepasse: 0,
+      valorPedagio: 0,
+      valorEstacionamento: 0,
+
+      // IDs de exemplo (certifica-te que estes IDs existem no teu DB)
+      empresaClienteId: "1",
+      unidadeClienteId: "1",
+      motoristaId: "1",
+      solicitanteId: "1",
+      adminUsuarioId: "1",
+      operadoraId: "1",
+      carroId: "1",
+
+      passageiros: [
+        { passageiroId: "6", statusPresenca: "Agendado" },
+        { passageiroId: "7", statusPresenca: "Agendado" },
+        { passageiroId: "20", statusPresenca: "Agendado" },
+      ],
+    };
     try {
       console.log("Executando Cron", new Date().toLocaleTimeString());
       const novoVoucher = await executarCriacaoVoucher(dadosExemploVoucher);
