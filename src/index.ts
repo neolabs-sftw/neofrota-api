@@ -49,12 +49,21 @@ async function startServer() {
     // A tua lógica real de vouchers ou limpeza entra aqui
   }
 
+  // Rota para teste manual ou acionamento pelo Vercel Cron
   app.get("/cron", (req, res) => {
     try {
+      // 1. Executamos a tarefa imediatamente
       console.log("Executando Cron", new Date().toLocaleTimeString());
-    } catch (err) {
-      console.error("Não Rodou",err);
-    }
+   
+      // 2. Respondemos ao navegador/Vercel que deu tudo certo
+      res
+        .status(200)
+        .send(
+          "Tarefa executada com sucesso às " + new Date().toLocaleTimeString(),
+        );
+    } catch (error) {
+      res.status(500).send("Erro na execução");
+    } 
   });
 
   await new Promise<any>((resolve) => {
