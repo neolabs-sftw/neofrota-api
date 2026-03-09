@@ -1,15 +1,6 @@
 import gql from "graphql-tag";
 
 export const modeloVoucherFixoTypes = gql`
-  enum DiaDaSemana {
-    Domingo
-    Segunda
-    Terca
-    Quarta
-    Quinta
-    Sexta
-    Sabado
-  }
 
   enum TipoCorrida {
     Entrada
@@ -34,7 +25,13 @@ export const modeloVoucherFixoTypes = gql`
     valorDeslocamentoRepasse: Float
     valorPedagio: Int
 
-    diasSemana: [DiaDaSemana!]!
+    domingo: Boolean!
+    segunda: Boolean!
+    terca: Boolean!
+    quarta: Boolean!
+    quinta: Boolean!
+    sexta: Boolean!
+    sabado: Boolean!
 
     passageiros: [VoucherPassageiro]
 

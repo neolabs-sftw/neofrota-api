@@ -1,15 +1,14 @@
-import gql from 'graphql-tag';
+import gql from "graphql-tag";
 
 export const modeloVoucherTurnoTypes = gql`
-
-enum DiaDaSemana {
-   Dom
-   Seg
-   Ter
-   Qua
-   Qui
-   Sex
-   Sab
+  enum DiaDaSemana {
+    Domingo
+    Segunda
+    Terca
+    Quarta
+    Quinta
+    Sexta
+    Sabado
   }
 
   type ModeloVoucherTurno {
@@ -95,9 +94,13 @@ enum DiaDaSemana {
   }
 
   type Mutation {
-    createModeloVoucherTurno(data: CriarModeloVoucherTurnoInput!): ModeloVoucherTurno!
-    updateModeloVoucherTurno(id: Int!, data: EditarModeloVoucherTurnoInput!): ModeloVoucherTurno!
+    createModeloVoucherTurno(
+      data: CriarModeloVoucherTurnoInput!
+    ): ModeloVoucherTurno!
+    updateModeloVoucherTurno(
+      id: Int!
+      data: EditarModeloVoucherTurnoInput!
+    ): ModeloVoucherTurno!
     deleterModeloVoucherTurno(id: Int!): Boolean!
   }
-`;  
-
+`;
