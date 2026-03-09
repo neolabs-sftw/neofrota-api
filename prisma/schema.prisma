@@ -308,16 +308,6 @@ model ModeloVoucherFixo {
   valorDeslocamentoRepasse Decimal @map("valor_deslocamento_repasse") @db.Decimal(10, 2)
   valorPedagio             Int?    @map("valor_pedagio")
 
-  // --- ALTERAÇÃO: Dias da Semana como Booleanos ---
-  domingo Boolean @default(false) @map("domingo")
-  segunda Boolean @default(false) @map("segunda")
-  terca   Boolean @default(false) @map("terca")
-  quarta  Boolean @default(false) @map("quarta")
-  quinta  Boolean @default(false) @map("quinta")
-  sexta   Boolean @default(false) @map("sexta")
-  sabado  Boolean @default(false) @map("sabado")
-  // ------------------------------------------------
-
   // Relacionamentos
   empresaCliente  EmpresaCliente           @relation(fields: [empresaClienteId], references: [id])
   unidadeCliente  UnidadeEmpresaCliente    @relation(fields: [unidadeClienteId], references: [id])
@@ -335,11 +325,22 @@ model ConfiguracaoViagemFixa {
   modeloFixoId Int         @map("modelo_fixo_id")
   tipo         TipoCorrida @map("tipo_corrida") // Entrada ou Saida
 
-  horario     DateTime @map("horario") @db.Time
+  horario DateTime @map("horario") @db.Time
+
+  // --- ALTERAÇÃO: Dias da Semana como Booleanos ---
+  domingo Boolean @default(false) @map("domingo")
+  segunda Boolean @default(false) @map("segunda")
+  terca   Boolean @default(false) @map("terca")
+  quarta  Boolean @default(false) @map("quarta")
+  quinta  Boolean @default(false) @map("quinta")
+  sexta   Boolean @default(false) @map("sexta")
+  sabado  Boolean @default(false) @map("sabado")
+  // ------------------------------------------------
+
   origem      String
   destino     String
-  motoristaId BigInt   @map("motorista_id")
-  carroId     Int      @map("carro_id")
+  motoristaId BigInt @map("motorista_id")
+  carroId     Int    @map("carro_id")
 
   modelo    ModeloVoucherFixo @relation(fields: [modeloFixoId], references: [id])
   motorista Motorista         @relation(fields: [motoristaId], references: [id])

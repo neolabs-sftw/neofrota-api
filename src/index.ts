@@ -6,6 +6,7 @@ import cors from "cors";
 import { typeDefs } from "./graphql/typeDefs";
 import { resolvers } from "./graphql/resolvers";
 import { executarCriacaoVoucher } from "./api/voucher.service";
+import { ProgramacaoDia } from "./api/programacaoFixo";
 
 async function startServer() {
   const app = express();
@@ -89,6 +90,12 @@ async function startServer() {
     } catch (error) {
       res.status(500).send("Erro na execução");
     }
+  });
+
+  app.get("/programacao", (req, res) => {
+    ProgramacaoDia();
+
+    res.status(200).send("Lista de Vouchers do dia OK")
   });
 
   await new Promise<any>((resolve) => {
