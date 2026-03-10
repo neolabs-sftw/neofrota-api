@@ -308,6 +308,8 @@ model ModeloVoucherFixo {
   valorDeslocamentoRepasse Decimal @map("valor_deslocamento_repasse") @db.Decimal(10, 2)
   valorPedagio             Int?    @map("valor_pedagio")
 
+  passageirosFixos ModeloVoucherFixoPassageiro[]
+
   // Relacionamentos
   empresaCliente  EmpresaCliente           @relation(fields: [empresaClienteId], references: [id])
   unidadeCliente  UnidadeEmpresaCliente    @relation(fields: [unidadeClienteId], references: [id])
@@ -318,6 +320,16 @@ model ModeloVoucherFixo {
   operadora       Operadora                @relation(fields: [operadoraId], references: [id])
 
   @@map("modelo_voucher_fixo")
+}
+
+model ModeloVoucherFixoPassageiro {
+  id           Int    @id @default(autoincrement())
+  modeloFixoId Int    @map("modelo_fixo_id")
+  passageiroId BigInt @map("passageiro_id")
+
+  modeloFixo ModeloVoucherFixo @relation(fields: [modeloFixoId], references: [id], onDelete: Cascade)
+
+  @@map("modelo_voucher_fixo_passageiro")
 }
 
 model ConfiguracaoViagemFixa {

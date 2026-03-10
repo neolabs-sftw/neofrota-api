@@ -2,14 +2,20 @@ import { prisma } from "../../prisma";
 import { $Enums, Prisma } from "@prisma/client";
 
 type TipoCorrida = $Enums.TipoCorrida;
-type DiaDaSemana = $Enums.DiaDaSemana;
 
 interface ConfiguracaoInput {
   tipo: TipoCorrida;
   horario: string;
+  domingo: boolean;
+  segunda: boolean;
+  terca: boolean;
+  quarta: boolean;
+  quinta: boolean;
+  sexta: boolean;
+  sabado: boolean;
   origem: string;
   destino: string;
-  motoristaId: string; // Vem como ID (string) do GraphQL
+  motoristaId: string;
   carroId: number;
 }
 
@@ -26,12 +32,55 @@ interface CreateModeloInput {
   valorDeslocamento?: number;
   valorDeslocamentoRepasse?: number;
   valorPedagio?: number;
-  diasSemana: DiaDaSemana[];
   configuracoes: ConfiguracaoInput[];
 }
 
 export const modeloVoucherFixoResolvers = {
-  Query: {},
+  Query: {
+    modelosVoucherFixo: async (_: any, args: any) => {
+      return await prisma.modeloVoucherFixo.findMany({
+        where: {
+          operadoraId: parseInt(args.operadoraId),
+        },
+      });
+    },
+  },
+  ModeloVoucherFixo: {
+    id: (parent: any) => String(parent.id),
+    empresaCliente: (parent: any) => {
+      return prisma.empresaCliente.findUnique({
+        where: { id: parent.empresaClienteId },
+      });
+    },
+    unidadeCliente: (parent: any) => {
+      return prisma.unidadeEmpresaCliente.findUnique({
+        where: { id: parent.unidadeClienteId },
+      });
+    },
+    pedagio: (parent: any) => {
+      return prisma.pedagio.findUnique({
+        where: { id: parent.valorPedagio },
+      });
+    },
+    configuracoes: async (parent: any) => {
+      return await prisma.configuracaoViagemFixa.findMany({
+        where: { modeloFixoId: parent.id },
+        include: {
+          motorista: true,
+          carro: true,
+        },
+      });
+    },
+  },
+  // ConfiguracaoViagemFixa: {
+  //   motoristaId: async (parent: any) => {
+  //     return await prisma.motorista.findUnique({
+  //       where: {
+  //         id: parent.motoristaId,
+  //       },
+  //     });
+  //   },
+  // },
   Mutation: {
     createModeloVoucherFixo: async (
       _parent: any,
@@ -61,14 +110,19 @@ export const modeloVoucherFixoResolvers = {
         valorViagem: new Prisma.Decimal(input.valorViagem),
         valorViagemRepasse: new Prisma.Decimal(input.valorViagemRepasse),
 
-        diasSemana: input.diasSemana as $Enums.DiaDaSemana[],
-
         // Nested Write com tipagem rigorosa
         configuracoes: {
           create: input.configuracoes.map((config) => ({
             tipo: config.tipo,
             // O Prisma trata campos @db.Time como objetos Date em JS
             horario: parseTimeStringToDate(config.horario),
+            domingo: config.domingo,
+            segunda: config.segunda,
+            terca: config.terca,
+            quarta: config.quarta,
+            quinta: config.quinta,
+            sexta: config.sexta,
+            sabado: config.sabado,
             origem: config.origem,
             destino: config.destino,
             motoristaId: BigInt(config.motoristaId),

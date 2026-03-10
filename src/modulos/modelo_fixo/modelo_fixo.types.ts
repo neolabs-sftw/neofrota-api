@@ -24,15 +24,7 @@ export const modeloVoucherFixoTypes = gql`
     valorDeslocamentoRepasse: Float
     valorPedagio: Int
 
-    domingo: Boolean!
-    segunda: Boolean!
-    terca: Boolean!
-    quarta: Boolean!
-    quinta: Boolean!
-    sexta: Boolean!
-    sabado: Boolean!
-
-    passageiros: [VoucherPassageiro]
+    passageiros: [ModeloVoucherFixoPassageiro]
 
     # Relacionamentos
     configuracoes: [ConfiguracaoViagemFixa!]!
@@ -46,7 +38,17 @@ export const modeloVoucherFixoTypes = gql`
     id: Int!
     modeloFixoId: Int!
     tipo: TipoCorrida!
+
     horario: String!
+
+    domingo: Boolean!
+    segunda: Boolean!
+    terca: Boolean!
+    quarta: Boolean!
+    quinta: Boolean!
+    sexta: Boolean!
+    sabado: Boolean!
+
     origem: String!
     destino: String!
 
@@ -59,14 +61,31 @@ export const modeloVoucherFixoTypes = gql`
     carro: Carro!
   }
 
+  type ModeloVoucherFixoPassageiro {
+    id: ID!
+    modeloFixoId: Int!
+    passageiroId: ID!
+    modeloFixo: ModeloVoucherFixo!
+    passageiro: Passageiro!
+  }
+
   type Query {
-    modelosVoucherFixo: [ModeloVoucherFixo!]!
+    modelosVoucherFixo(operadoraId: ID!): [ModeloVoucherFixo!]!
     modeloVoucherFixo(id: Int!): ModeloVoucherFixo
   }
 
   input ConfiguracaoViagemInput {
     tipo: TipoCorrida!
+
     horario: String! # Ex: "2024-05-20T08:00:00Z" ou apenas a hora dependendo da sua conversão
+    domingo: Boolean!
+    segunda: Boolean!
+    terca: Boolean!
+    quarta: Boolean!
+    quinta: Boolean!
+    sexta: Boolean!
+    sabado: Boolean!
+
     origem: String!
     destino: String!
     motoristaId: ID!
@@ -88,14 +107,6 @@ export const modeloVoucherFixoTypes = gql`
     valorDeslocamento: Float
     valorDeslocamentoRepasse: Float
     valorPedagio: Int # ID do Pedágio se houver relação
-    domingo: Boolean!
-    segunda: Boolean!
-    terca: Boolean!
-    quarta: Boolean!
-    quinta: Boolean!
-    sexta: Boolean!
-    sabado: Boolean!
-
     passageiros: [VoucherPassageiroCreateInput]
 
     # O Nested Write acontece aqui
