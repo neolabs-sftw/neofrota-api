@@ -84,7 +84,7 @@ model Motorista {
   operadora              Operadora?               @relation(fields: [operadoraId], references: [id])
   agregadoRelacao        RelacaoAgrdFunc[]        @relation("Agregado")
   funcionarioRelacao     RelacaoAgrdFunc[]        @relation("Funcionario")
-  configuracaoViagemFixa ConfiguracaoViagemFixa[]
+  configuracaoViagemFixa ModeloVoucherFixoConfig []
 
   @@map("motorista")
 }
@@ -108,7 +108,7 @@ model Carro {
   motorista              Motorista?               @relation(fields: [motoristaId], references: [id])
   vouchers               Voucher[]
   modeloVoucherTurno     ModeloVoucherTurno[]
-  configuracaoViagemFixa ConfiguracaoViagemFixa[]
+  configuracaoViagemFixa ModeloVoucherFixoConfig []
 
   @@map("carro")
 }
@@ -313,7 +313,7 @@ model ModeloVoucherFixo {
   // Relacionamentos
   empresaCliente  EmpresaCliente           @relation(fields: [empresaClienteId], references: [id])
   unidadeCliente  UnidadeEmpresaCliente    @relation(fields: [unidadeClienteId], references: [id])
-  configuracoes   ConfiguracaoViagemFixa[]
+  configuracoes   ModeloVoucherFixoConfig []
   vouchersGerados Voucher[]
   pedagio         Pedagio?                 @relation(fields: [valorPedagio], references: [id])
   adminUsuario    AdminUsuario             @relation(fields: [adminUsuarioId], references: [id])
@@ -332,12 +332,12 @@ model ModeloVoucherFixoPassageiro {
   @@map("modelo_voucher_fixo_passageiro")
 }
 
-model ConfiguracaoViagemFixa {
+model ModeloVoucherFixoConfig {
   id           Int         @id @default(autoincrement())
   modeloFixoId Int         @map("modelo_fixo_id")
   tipo         TipoCorrida @map("tipo_corrida") // Entrada ou Saida
 
-  horario DateTime @map("horario") @db.Time
+  horario String @map("horario") 
 
   // --- ALTERAÇÃO: Dias da Semana como Booleanos ---
   domingo Boolean @default(false) @map("domingo")
@@ -359,7 +359,7 @@ model ConfiguracaoViagemFixa {
   carro     Carro             @relation(fields: [carroId], references: [id])
 
   @@unique([modeloFixoId, tipo])
-  @@map("configuracao_viagem_fixa")
+  @@map("modelo_voucher_fixo_config")
 }
 
 model ModeloVoucherTurno {

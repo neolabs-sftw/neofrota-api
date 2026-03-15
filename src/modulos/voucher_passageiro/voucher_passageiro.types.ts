@@ -20,7 +20,6 @@ export const voucherPassageiroTypes = gql`
 
   input VoucherPassageiroCreateInput {
     passageiroId: ID!
-
     horarioEmbarqueReal: DateTime
     rateio: Float
     statusPresenca: StatusPresenca

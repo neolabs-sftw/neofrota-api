@@ -19,6 +19,10 @@ interface ConfiguracaoInput {
   carroId: number;
 }
 
+interface PassageiroInput {
+  passageiroId: string;
+}
+
 interface CreateModeloInput {
   nomeModelo: string;
   empresaClienteId: string;
@@ -33,6 +37,7 @@ interface CreateModeloInput {
   valorDeslocamentoRepasse?: number;
   valorPedagio?: number;
   configuracoes: ConfiguracaoInput[];
+  passageirosFixos: PassageiroInput[];
 }
 
 export const modeloVoucherFixoResolvers = {
@@ -41,6 +46,20 @@ export const modeloVoucherFixoResolvers = {
       return await prisma.modeloVoucherFixo.findMany({
         where: {
           operadoraId: parseInt(args.operadoraId),
+        },
+      });
+    },
+    modeloVoucherFixo: async (_: any, args: any) => {
+      return await prisma.modeloVoucherFixo.findUnique({
+        where: {
+          id: args.id,
+        },
+        include: {
+          configuracoes: true,
+          passageirosFixos: true,
+          pedagio: true,
+          empresaCliente: true,
+          unidadeCliente: true,
         },
       });
     },
@@ -58,12 +77,15 @@ export const modeloVoucherFixoResolvers = {
       });
     },
     pedagio: (parent: any) => {
+      if (!parent.valorPedagio) {
+        return null;
+      }
       return prisma.pedagio.findUnique({
         where: { id: parent.valorPedagio },
       });
     },
     configuracoes: async (parent: any) => {
-      return await prisma.configuracaoViagemFixa.findMany({
+      return await prisma.modeloVoucherFixoConfig.findMany({
         where: { modeloFixoId: parent.id },
         include: {
           motorista: true,
@@ -71,51 +93,44 @@ export const modeloVoucherFixoResolvers = {
         },
       });
     },
+    passageirosFixos: async (parent: any) => {
+      return await prisma.modeloVoucherFixoPassageiro.findMany({
+        where: { modeloFixoId: parent.id },
+      });
+    },
   },
-  // ConfiguracaoViagemFixa: {
-  //   motoristaId: async (parent: any) => {
-  //     return await prisma.motorista.findUnique({
-  //       where: {
-  //         id: parent.motoristaId,
-  //       },
-  //     });
-  //   },
-  // },
+  ModeloVoucherFixoPassageiro: {
+    passageiro: async (parent: any) => {
+      return await prisma.passageiro.findUnique({
+        where: { id: parent.passageiroId },
+      });
+    },
+  },
   Mutation: {
     createModeloVoucherFixo: async (
       _parent: any,
       { input }: { input: CreateModeloInput },
     ) => {
-      const parseTimeStringToDate = (timeString: string): Date => {
-        // Criamos uma data base qualquer (hoje)
-        const [horas, minutos, segundos] = timeString.split(":").map(Number);
-        const date = new Date();
-
-        // Definimos o horário. Importante: use setHours para garantir
-        // que o objeto Date seja válido para o motor do Prisma.
-        date.setHours(horas || 0, minutos || 0, segundos || 0, 0);
-
-        return date;
-      };
-
       const dataInput: any = {
         nomeModelo: input.nomeModelo,
         ativo: true,
-        // Conversões explícitas para os tipos do Prisma (BigInt e Decimal)
         empresaClienteId: BigInt(input.empresaClienteId),
         unidadeClienteId: BigInt(input.unidadeClienteId),
         operadoraId: BigInt(input.operadoraId),
         adminUsuarioId: BigInt(input.adminUsuarioId),
+        valorViagem: Number(input.valorViagem),
+        valorViagemRepasse: Number(input.valorViagemRepasse),
+        valorHoraParada: Number(input.valorHoraParada),
+        valorHoraParadaRepasse: Number(input.valorHoraParadaRepasse),
+        valorDeslocamento: Number(input.valorDeslocamento),
+        valorDeslocamentoRepasse: Number(input.valorDeslocamentoRepasse),
+        valorPedagio: input.valorPedagio ? Number(input.valorPedagio) : null,
 
-        valorViagem: new Prisma.Decimal(input.valorViagem),
-        valorViagemRepasse: new Prisma.Decimal(input.valorViagemRepasse),
-
-        // Nested Write com tipagem rigorosa
+        // 1. NESTED WRITE: Configurações
         configuracoes: {
           create: input.configuracoes.map((config) => ({
             tipo: config.tipo,
-            // O Prisma trata campos @db.Time como objetos Date em JS
-            horario: parseTimeStringToDate(config.horario),
+            horario: config.horario,
             domingo: config.domingo,
             segunda: config.segunda,
             terca: config.terca,
@@ -129,34 +144,72 @@ export const modeloVoucherFixoResolvers = {
             carroId: config.carroId,
           })),
         },
+
+        // 2. NESTED WRITE: Passageiros (ADICIONADO AQUI)
+        passageirosFixos: {
+          create: input.passageirosFixos?.map((p) => ({
+            // O Prisma lida com a conexão do modeloFixoId automaticamente por estar no 'create'
+            passageiroId: BigInt(p.passageiroId),
+          })),
+        },
       };
 
-      if (input.valorHoraParada !== undefined) {
-        dataInput.valorHoraParada = new Prisma.Decimal(input.valorHoraParada);
-      }
-      if (input.valorHoraParadaRepasse !== undefined) {
-        dataInput.valorHoraParadaRepasse = new Prisma.Decimal(
-          input.valorHoraParadaRepasse,
-        );
-      }
-      if (input.valorDeslocamento !== undefined) {
-        dataInput.valorDeslocamento = new Prisma.Decimal(
-          input.valorDeslocamento,
-        );
-      }
-      if (input.valorDeslocamentoRepasse !== undefined) {
-        dataInput.valorDeslocamentoRepasse = new Prisma.Decimal(
-          input.valorDeslocamentoRepasse,
-        );
-      }
-      if (input.valorPedagio !== undefined) {
-        dataInput.valorPedagio = new Prisma.Decimal(input.valorPedagio);
-      }
+      // ... (seus blocos IF para valores opcionais de parada e pedágio)
 
       return await prisma.modeloVoucherFixo.create({
         data: dataInput,
         include: {
           configuracoes: true,
+          passageirosFixos: true,
+          pedagio: true,
+        },
+      });
+    },
+    updateModeloVoucherFixo: async (
+      _parent: any,
+      { id, input }: { id: number; input: CreateModeloInput },
+    ) => {
+
+      return await prisma.modeloVoucherFixo.update({
+        where: { id: Number(id) },
+        data: {
+          nomeModelo: input.nomeModelo,
+          empresaClienteId: BigInt(input.empresaClienteId),
+          unidadeClienteId: BigInt(input.unidadeClienteId),
+          operadoraId: BigInt(input.operadoraId),
+          adminUsuarioId: BigInt(input.adminUsuarioId),
+          valorViagem: Number(input.valorViagem),
+          valorViagemRepasse: Number(input.valorViagemRepasse),
+          valorHoraParada: Number(input.valorHoraParada),
+          valorHoraParadaRepasse: Number(input.valorHoraParadaRepasse),
+          valorDeslocamento: Number(input.valorDeslocamento),
+          valorDeslocamentoRepasse: Number(input.valorDeslocamentoRepasse),
+          valorPedagio: input.valorPedagio ? Number(input.valorPedagio) : null,
+          configuracoes: {
+            deleteMany: {},
+            create: input.configuracoes.map((config) => ({
+              tipo: config.tipo,
+              horario:config.horario,
+              domingo: config.domingo,
+              segunda: config.segunda,
+              terca: config.terca,
+              quarta: config.quarta,
+              quinta: config.quinta,
+              sexta: config.sexta,
+              sabado: config.sabado,
+              origem: config.origem,
+              destino: config.destino,
+              motoristaId: BigInt(config.motoristaId),
+              carroId: config.carroId,
+            })),
+          },
+          passageirosFixos: {
+            deleteMany: {},
+            create:
+              input.passageirosFixos?.map((p) => ({
+                passageiroId: BigInt(p.passageiroId),
+              })) || [],
+          },
         },
       });
     },

@@ -24,17 +24,17 @@ export const modeloVoucherFixoTypes = gql`
     valorDeslocamentoRepasse: Float
     valorPedagio: Int
 
-    passageiros: [ModeloVoucherFixoPassageiro]
+    passageirosFixos: [ModeloVoucherFixoPassageiro]
 
     # Relacionamentos
-    configuracoes: [ConfiguracaoViagemFixa!]!
+    configuracoes: [ModeloVoucherFixoConfig!]!
     empresaCliente: EmpresaCliente!
     unidadeCliente: UnidadeEmpresaCliente!
     operadora: Operadora!
     pedagio: Pedagio
   }
 
-  type ConfiguracaoViagemFixa {
+  type ModeloVoucherFixoConfig {
     id: Int!
     modeloFixoId: Int!
     tipo: TipoCorrida!
@@ -74,7 +74,7 @@ export const modeloVoucherFixoTypes = gql`
     modeloVoucherFixo(id: Int!): ModeloVoucherFixo
   }
 
-  input ConfiguracaoViagemInput {
+  input ModeloVoucherFixoConfigInput {
     tipo: TipoCorrida!
 
     horario: String! # Ex: "2024-05-20T08:00:00Z" ou apenas a hora dependendo da sua conversão
@@ -92,6 +92,11 @@ export const modeloVoucherFixoTypes = gql`
     carroId: Int!
   }
 
+  type ModeloVoucherFixoPassageiro {
+    modeloFixoId: Int!
+    passageiroId: ID!
+  }
+
   input CreateModeloVoucherFixoInput {
     nomeModelo: String!
     empresaClienteId: ID!
@@ -106,16 +111,40 @@ export const modeloVoucherFixoTypes = gql`
     valorHoraParadaRepasse: Float
     valorDeslocamento: Float
     valorDeslocamentoRepasse: Float
-    valorPedagio: Int # ID do Pedágio se houver relação
-    passageiros: [VoucherPassageiroCreateInput]
+    valorPedagio: Int
+    passageirosFixos: [VoucherPassageiroCreateInput]
 
     # O Nested Write acontece aqui
-    configuracoes: [ConfiguracaoViagemInput!]!
+    configuracoes: [ModeloVoucherFixoConfigInput!]!
+  }
+  input UpdateModeloVoucherFixoInput {
+    nomeModelo: String!
+    empresaClienteId: ID!
+    unidadeClienteId: ID!
+    operadoraId: ID!
+    adminUsuarioId: ID!
+
+    # Valores
+    valorViagem: Float!
+    valorViagemRepasse: Float!
+    valorHoraParada: Float
+    valorHoraParadaRepasse: Float
+    valorDeslocamento: Float
+    valorDeslocamentoRepasse: Float
+    valorPedagio: Int
+    passageirosFixos: [VoucherPassageiroCreateInput]
+
+    # O Nested Write acontece aqui
+    configuracoes: [ModeloVoucherFixoConfigInput!]!
   }
 
   type Mutation {
     createModeloVoucherFixo(
       input: CreateModeloVoucherFixoInput!
+    ): ModeloVoucherFixo!
+    updateModeloVoucherFixo(
+      id: Int!
+      input: UpdateModeloVoucherFixoInput!
     ): ModeloVoucherFixo!
   }
 `;
