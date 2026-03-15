@@ -47,6 +47,16 @@ export const modeloVoucherFixoResolvers = {
         where: {
           operadoraId: parseInt(args.operadoraId),
         },
+        orderBy: {
+          nomeModelo: "asc",
+        },
+        include: {
+          empresaCliente: true,
+          unidadeCliente: true,
+          pedagio: true,
+          configuracoes: true,
+          passageirosFixos: true,
+        },
       });
     },
     modeloVoucherFixo: async (_: any, args: any) => {
@@ -167,50 +177,53 @@ export const modeloVoucherFixoResolvers = {
     },
     updateModeloVoucherFixo: async (
       _parent: any,
-      { id, input }: { id: number; input: CreateModeloInput },
+      args: { id: number; input: Partial<CreateModeloInput> },
     ) => {
+      const { input } = args;
+      const { configuracoes, passageirosFixos, ...rest } = input;
+
+      const updateData: any = {
+        ...rest,
+      };
+
+      if (rest.empresaClienteId) updateData.empresaClienteId = BigInt(rest.empresaClienteId);
+      if (rest.unidadeClienteId) updateData.unidadeClienteId = BigInt(rest.unidadeClienteId);
+      if (rest.operadoraId) updateData.operadoraId = BigInt(rest.operadoraId);
+      if (rest.adminUsuarioId) updateData.adminUsuarioId = BigInt(rest.adminUsuarioId);
+
+      if (configuracoes) {
+        updateData.configuracoes = {
+          deleteMany: {},
+          create: configuracoes.map((config) => ({
+            tipo: config.tipo,
+            horario: config.horario,
+            domingo: config.domingo,
+            segunda: config.segunda,
+            terca: config.terca,
+            quarta: config.quarta,
+            quinta: config.quinta,
+            sexta: config.sexta,
+            sabado: config.sabado,
+            origem: config.origem,
+            destino: config.destino,
+            motoristaId: BigInt(config.motoristaId),
+            carroId: config.carroId,
+          })),
+        };
+      }
+
+      if (passageirosFixos) {
+        updateData.passageirosFixos = {
+          deleteMany: {},
+          create: passageirosFixos.map((p) => ({
+            passageiroId: BigInt(p.passageiroId),
+          })),
+        };
+      }
 
       return await prisma.modeloVoucherFixo.update({
-        where: { id: Number(id) },
-        data: {
-          nomeModelo: input.nomeModelo,
-          empresaClienteId: BigInt(input.empresaClienteId),
-          unidadeClienteId: BigInt(input.unidadeClienteId),
-          operadoraId: BigInt(input.operadoraId),
-          adminUsuarioId: BigInt(input.adminUsuarioId),
-          valorViagem: Number(input.valorViagem),
-          valorViagemRepasse: Number(input.valorViagemRepasse),
-          valorHoraParada: Number(input.valorHoraParada),
-          valorHoraParadaRepasse: Number(input.valorHoraParadaRepasse),
-          valorDeslocamento: Number(input.valorDeslocamento),
-          valorDeslocamentoRepasse: Number(input.valorDeslocamentoRepasse),
-          valorPedagio: input.valorPedagio ? Number(input.valorPedagio) : null,
-          configuracoes: {
-            deleteMany: {},
-            create: input.configuracoes.map((config) => ({
-              tipo: config.tipo,
-              horario:config.horario,
-              domingo: config.domingo,
-              segunda: config.segunda,
-              terca: config.terca,
-              quarta: config.quarta,
-              quinta: config.quinta,
-              sexta: config.sexta,
-              sabado: config.sabado,
-              origem: config.origem,
-              destino: config.destino,
-              motoristaId: BigInt(config.motoristaId),
-              carroId: config.carroId,
-            })),
-          },
-          passageirosFixos: {
-            deleteMany: {},
-            create:
-              input.passageirosFixos?.map((p) => ({
-                passageiroId: BigInt(p.passageiroId),
-              })) || [],
-          },
-        },
+        where: { id: Number(args.id) },
+        data: updateData,
       });
     },
   },

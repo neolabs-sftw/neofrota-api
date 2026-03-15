@@ -77,7 +77,7 @@ export const modeloVoucherFixoTypes = gql`
   input ModeloVoucherFixoConfigInput {
     tipo: TipoCorrida!
 
-    horario: String! # Ex: "2024-05-20T08:00:00Z" ou apenas a hora dependendo da sua conversão
+    horario: String!
     domingo: Boolean!
     segunda: Boolean!
     terca: Boolean!
@@ -118,15 +118,17 @@ export const modeloVoucherFixoTypes = gql`
     configuracoes: [ModeloVoucherFixoConfigInput!]!
   }
   input UpdateModeloVoucherFixoInput {
-    nomeModelo: String!
-    empresaClienteId: ID!
-    unidadeClienteId: ID!
-    operadoraId: ID!
-    adminUsuarioId: ID!
+    ativo: Boolean
+
+    nomeModelo: String
+    empresaClienteId: ID
+    unidadeClienteId: ID
+    operadoraId: ID
+    adminUsuarioId: ID
 
     # Valores
-    valorViagem: Float!
-    valorViagemRepasse: Float!
+    valorViagem: Float
+    valorViagemRepasse: Float
     valorHoraParada: Float
     valorHoraParadaRepasse: Float
     valorDeslocamento: Float
@@ -135,7 +137,7 @@ export const modeloVoucherFixoTypes = gql`
     passageirosFixos: [VoucherPassageiroCreateInput]
 
     # O Nested Write acontece aqui
-    configuracoes: [ModeloVoucherFixoConfigInput!]!
+    configuracoes: [ModeloVoucherFixoConfigInput]
   }
 
   type Mutation {
