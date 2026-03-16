@@ -81,10 +81,10 @@ model Motorista {
   carro                  Carro[]
   modeloVoucherTurno     ModeloVoucherTurno[]
   voucher                Voucher[]
-  operadora              Operadora?               @relation(fields: [operadoraId], references: [id])
-  agregadoRelacao        RelacaoAgrdFunc[]        @relation("Agregado")
-  funcionarioRelacao     RelacaoAgrdFunc[]        @relation("Funcionario")
-  configuracaoViagemFixa ModeloVoucherFixoConfig []
+  operadora              Operadora?                @relation(fields: [operadoraId], references: [id])
+  agregadoRelacao        RelacaoAgrdFunc[]         @relation("Agregado")
+  funcionarioRelacao     RelacaoAgrdFunc[]         @relation("Funcionario")
+  configuracaoViagemFixa ModeloVoucherFixoConfig[]
 
   @@map("motorista")
 }
@@ -104,11 +104,11 @@ model Carro {
   motoristaId BigInt?   @map("motorista_id")
   operadoraId BigInt?   @map("operadora_id")
 
-  operadora              Operadora?               @relation(fields: [operadoraId], references: [id])
-  motorista              Motorista?               @relation(fields: [motoristaId], references: [id])
+  operadora              Operadora?                @relation(fields: [operadoraId], references: [id])
+  motorista              Motorista?                @relation(fields: [motoristaId], references: [id])
   vouchers               Voucher[]
   modeloVoucherTurno     ModeloVoucherTurno[]
-  configuracaoViagemFixa ModeloVoucherFixoConfig []
+  configuracaoViagemFixa ModeloVoucherFixoConfig[]
 
   @@map("carro")
 }
@@ -300,24 +300,24 @@ model ModeloVoucherFixo {
 
   // Valores Base
   // Se os valores mudarem entre entrada e saída, devem ir para a tabela de Configuração
-  valorViagem              Decimal @map("valor_viagem") @db.Decimal(10, 2)
-  valorViagemRepasse       Decimal @map("valor_viagem_repasse") @db.Decimal(10, 2)
-  valorHoraParada          Decimal @map("valor_hora_parada") @db.Decimal(10, 2)
-  valorHoraParadaRepasse   Decimal @map("valor_hora_parada_repasse") @db.Decimal(10, 2)
-  valorDeslocamento        Decimal @map("valor_deslocamento") @db.Decimal(10, 2)
-  valorDeslocamentoRepasse Decimal @map("valor_deslocamento_repasse") @db.Decimal(10, 2)
-  valorPedagio             Int?    @map("valor_pedagio")
+  valorViagem              Decimal? @map("valor_viagem") @db.Decimal(10, 2)
+  valorViagemRepasse       Decimal? @map("valor_viagem_repasse") @db.Decimal(10, 2)
+  valorHoraParada          Decimal? @map("valor_hora_parada") @db.Decimal(10, 2)
+  valorHoraParadaRepasse   Decimal? @map("valor_hora_parada_repasse") @db.Decimal(10, 2)
+  valorDeslocamento        Decimal? @map("valor_deslocamento") @db.Decimal(10, 2)
+  valorDeslocamentoRepasse Decimal? @map("valor_deslocamento_repasse") @db.Decimal(10, 2)
+  valorPedagio             Int?     @map("valor_pedagio")
 
   passageirosFixos ModeloVoucherFixoPassageiro[]
 
   // Relacionamentos
-  empresaCliente  EmpresaCliente           @relation(fields: [empresaClienteId], references: [id])
-  unidadeCliente  UnidadeEmpresaCliente    @relation(fields: [unidadeClienteId], references: [id])
-  configuracoes   ModeloVoucherFixoConfig []
+  empresaCliente  EmpresaCliente            @relation(fields: [empresaClienteId], references: [id])
+  unidadeCliente  UnidadeEmpresaCliente     @relation(fields: [unidadeClienteId], references: [id])
+  configuracoes   ModeloVoucherFixoConfig[]
   vouchersGerados Voucher[]
-  pedagio         Pedagio?                 @relation(fields: [valorPedagio], references: [id])
-  adminUsuario    AdminUsuario             @relation(fields: [adminUsuarioId], references: [id])
-  operadora       Operadora                @relation(fields: [operadoraId], references: [id])
+  pedagio         Pedagio?                  @relation(fields: [valorPedagio], references: [id])
+  adminUsuario    AdminUsuario              @relation(fields: [adminUsuarioId], references: [id])
+  operadora       Operadora                 @relation(fields: [operadoraId], references: [id])
 
   @@map("modelo_voucher_fixo")
 }
@@ -337,7 +337,7 @@ model ModeloVoucherFixoConfig {
   modeloFixoId Int         @map("modelo_fixo_id")
   tipo         TipoCorrida @map("tipo_corrida") // Entrada ou Saida
 
-  horario String @map("horario") 
+  horario String @map("horario")
 
   // --- ALTERAÇÃO: Dias da Semana como Booleanos ---
   domingo Boolean @default(false) @map("domingo")
@@ -374,15 +374,15 @@ model ModeloVoucherTurno {
   tipoCorrida                String        @map("tipo_corrida")
   origem                     String        @map("origem")
   destino                    String        @map("destino")
-  valorViagem                Decimal       @map("valor_viagem") @db.Decimal(10, 2)
-  valorViagemRepasse         Decimal       @map("valor_viagem_repasse") @db.Decimal(10, 2)
-  valorPedagio               Decimal       @map("valor_pedagio") @db.Decimal(10, 2)
-  valorPedagioRepasse        Decimal       @map("valor_pedagio_repasse") @db.Decimal(10, 2)
-  valorEstacionamento        Decimal       @map("valor_estacionamento") @db.Decimal(10, 2)
-  valorEstacionamentoRepasse Decimal       @map("valor_estacionamento_repasse") @db.Decimal(10, 2)
-  valorTempoParado           Decimal       @map("valor_tempo_parado") @db.Decimal(10, 2)
-  valorTempoParadoRepasse    Decimal       @map("valor_tempo_parado_repasse") @db.Decimal(10, 2)
-  dataInicio                 DateTime      @map("data_inicio")
+  valorViagem                Decimal?      @map("valor_viagem") @db.Decimal(10, 2)
+  valorViagemRepasse         Decimal?      @map("valor_viagem_repasse") @db.Decimal(10, 2)
+  valorPedagio               Decimal?      @map("valor_pedagio") @db.Decimal(10, 2)
+  valorPedagioRepasse        Decimal?      @map("valor_pedagio_repasse") @db.Decimal(10, 2)
+  valorEstacionamento        Decimal?      @map("valor_estacionamento") @db.Decimal(10, 2)
+  valorEstacionamentoRepasse Decimal?      @map("valor_estacionamento_repasse") @db.Decimal(10, 2)
+  valorTempoParado           Decimal?      @map("valor_tempo_parado") @db.Decimal(10, 2)
+  valorTempoParadoRepasse    Decimal?      @map("valor_tempo_parado_repasse") @db.Decimal(10, 2)
+  dataInicio                 DateTime?     @map("data_inicio")
   dataFim                    DateTime?     @map("data_fim")
   horario                    DateTime      @map("horario") @db.Time
   diasSemana                 DiaDaSemana[] @map("dias_semana")
@@ -433,14 +433,14 @@ model Voucher {
   dataHoraProgramado       DateTime        @map("data_hora_programado")
   dataHoraConclusao        DateTime?       @map("data_hora_conclusao")
   dataHoraCriacao          DateTime        @default(now()) @map("data_hora_criacao")
-  valorViagem              Decimal         @map("valor_viagem") @db.Decimal(10, 2)
-  valorViagemRepasse       Decimal         @map("valor_viagem_repasse") @db.Decimal(10, 2)
-  valorDeslocamento        Decimal         @map("valor_deslocamento") @db.Decimal(10, 2)
-  valorDeslocamentoRepasse Decimal         @map("valor_deslocamento_repasse") @db.Decimal(10, 2)
-  valorHoraParada          Decimal         @map("valor_hora_parada") @db.Decimal(10, 2)
-  valorHoraParadaRepasse   Decimal         @map("valor_hora_parada_repasse") @db.Decimal(10, 2)
-  valorEstacionamento      Decimal         @map("valor_estacionamento") @db.Decimal(10, 2)
-  valorPedagio             Decimal         @map("valor_pedagio") @db.Decimal(10, 2)
+  valorViagem              Decimal?        @map("valor_viagem") @db.Decimal(10, 2)
+  valorViagemRepasse       Decimal?        @map("valor_viagem_repasse") @db.Decimal(10, 2)
+  valorDeslocamento        Decimal?        @map("valor_deslocamento") @db.Decimal(10, 2)
+  valorDeslocamentoRepasse Decimal?        @map("valor_deslocamento_repasse") @db.Decimal(10, 2)
+  valorHoraParada          Decimal?        @map("valor_hora_parada") @db.Decimal(10, 2)
+  valorHoraParadaRepasse   Decimal?        @map("valor_hora_parada_repasse") @db.Decimal(10, 2)
+  valorEstacionamento      Decimal?        @map("valor_estacionamento") @db.Decimal(10, 2)
+  valorPedagio             Decimal?        @map("valor_pedagio") @db.Decimal(10, 2)
   qntTempoParado           Int?            @map("qnt_tempo_parado")
   assinatura               String?         @map("assinatura")
   observacaoMotorista      String?         @map("observacao_motorista")
