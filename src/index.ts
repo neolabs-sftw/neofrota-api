@@ -50,7 +50,7 @@ async function startServer() {
         .status(200)
         .json({
           mensagem: "Lista de Vouchers gerada com sucesso",
-          dados: resultado,
+          totalGerado: resultado.length
         });
     } catch (error) {
       console.error("Erro na rota /programacao:", error);
