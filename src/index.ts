@@ -43,59 +43,23 @@ async function startServer() {
     res.status(200).send("pong");
   });
 
-  app.get("/cron", async (req, res) => {
-    const dadosExemploVoucher = {
-      origem: "Sede Central",
-      destino: "Filial Norte",
-      dataHoraProgramado: new Date(),
-      natureza: "Fixo",
-      tipoCorrida: "Entrada",
-      status: "Aberto",
-
-      // ADICIONA ESTES CAMPOS (e outros que sejam obrigatórios no teu schema)
-      valorViagem: 50.0,
-      valorViagemRepasse: 40.0,
-      valorDeslocamento: 0,
-      valorDeslocamentoRepasse: 0,
-      valorHoraParada: 0,
-      valorHoraParadaRepasse: 0,
-      valorPedagio: 0,
-      valorEstacionamento: 0,
-
-      // IDs de exemplo (certifica-te que estes IDs existem no teu DB)
-      empresaClienteId: "1",
-      unidadeClienteId: "1",
-      motoristaId: "1",
-      solicitanteId: "1",
-      adminUsuarioId: "1",
-      operadoraId: "1",
-      carroId: "1",
-
-      passageiros: [
-        { passageiroId: "1", statusPresenca: "Agendado" },
-        { passageiroId: "2", statusPresenca: "Agendado" },
-        { passageiroId: "3", statusPresenca: "Agendado" },
-      ],
-    };
+  app.get("/programacao", async (req, res) => {
     try {
-      console.log("Executando Cron", new Date().toLocaleTimeString());
-      const novoVoucher = await executarCriacaoVoucher(dadosExemploVoucher);
-      console.log(`Voucher criado com sucesso! ID: ${novoVoucher.id} `);
-
+      const resultado = await ProgramacaoDia();
       res
         .status(200)
-        .send(
-          "Tarefa executada com sucesso às " + new Date().toLocaleTimeString(),
-        );
+        .json({
+          mensagem: "Lista de Vouchers gerada com sucesso",
+          dados: resultado,
+        });
     } catch (error) {
-      res.status(500).send("Erro na execução");
+      console.error("Erro na rota /programacao:", error);
+      res
+        .status(500)
+        .json({
+          mensagem: "Erro crítico ao gerar programação. Nenhum voucher salvo.",
+        });
     }
-  });
-
-  app.get("/programacao", (req, res) => {
-    ProgramacaoDia();
-
-    res.status(200).send("Lista de Vouchers do dia OK")
   });
 
   await new Promise<any>((resolve) => {
