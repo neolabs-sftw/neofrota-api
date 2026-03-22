@@ -162,6 +162,20 @@ export const voucherTypes = gql`
     # Adicione filtros relevantes
   }
 
+  input FiltroVouchersInput {
+    operadoraId: ID!
+    dataInicio: String # Formato esperado: "YYYY-MM-DD"
+    dataFim: String # Formato esperado: "YYYY-MM-DD"
+    empresaClienteId: ID
+    unidadeClienteId: ID
+    motoristaId: ID
+    solicitanteId: ID
+    adminUsuarioId: ID
+    tipoCorrida: String
+    natureza: String
+    status: String
+  }
+
   # Queries (exemplo básico, adicione mais se necessário)
   extend type Query {
     voucher(id: ID!): Voucher
@@ -177,6 +191,7 @@ export const voucherTypes = gql`
       diaSelecionado: String!
     ): [Voucher!]!
     voucherOperadoraData(operadoraId: ID!, diaSelecionado: String!): [Voucher!]
+    vouchersFiltrados(filtro: FiltroVouchersInput!): [Voucher]
     voucherPassageiro(id: ID!): VoucherPassageiro!
     voucherPassageiros: [VoucherPassageiro]
   }

@@ -64,6 +64,83 @@ export const voucherResolvers = {
         throw error;
       }
     },
+    vouchersFiltrados: async (_: any, { filtro }: any) => {
+      const {
+        operadoraId,
+        dataInicio,
+        dataFim,
+        empresaClienteId,
+        unidadeClienteId,
+        motoristaId,
+        solicitanteId,
+        adminUsuarioId,
+        tipoCorrida,
+        natureza,
+        status
+      } = filtro;
+
+      // 1. Lógica para o filtro de datas (De / Até)
+      let filtroData: any = undefined;
+
+      if (dataInicio || dataFim) {
+        filtroData = {};
+        if (dataInicio) {
+          // Início do dia
+          filtroData.gte = new Date(`${dataInicio}T00:00:00.000Z`);
+        }
+        if (dataFim) {
+          // Para o 'Até', adicionamos 1 dia para pegar até as 23:59:59 do dia selecionado
+          const end = new Date(`${dataFim}T00:00:00.000Z`);
+          end.setUTCDate(end.getUTCDate() + 1);
+          filtroData.lt = end;
+        }
+      }
+
+      // 2. Consulta no Prisma usando o truque do 'undefined'
+      return await prisma.voucher.findMany({
+        where: {
+          operadoraId: operadoraId, // Obrigatório
+          dataHoraProgramado: filtroData, // Aplica o range de data se existir
+
+          // O Prisma ignora campos undefined dinamicamente!
+          empresaClienteId: empresaClienteId || undefined,
+          unidadeClienteId: unidadeClienteId || undefined,
+          motoristaId: motoristaId || undefined,
+          solicitanteId: solicitanteId || undefined,
+          adminUsuarioId: adminUsuarioId || undefined,
+          tipoCorrida: tipoCorrida || undefined,
+          natureza: natureza || undefined,
+          status: status || undefined
+        },
+        orderBy: { dataHoraProgramado: "desc" }, // Mais recentes primeiro
+        include: {
+          empresaCliente: true,
+          unidadeCliente: true,
+          motorista: true,
+          carro: true,
+          adminUsuario: true,
+          solicitante: true,
+          operadora: true,
+          modeloFixo: {
+            include: {
+              configuracoes: {
+                include: {
+                  modelo: true
+                }
+              }
+            }
+          },
+          modeloTurno: true,
+          rota: true,
+          passageiros: {
+            include: {
+              passageiro: true,
+              voucher: true,
+            },
+          },
+        },
+      });
+    },
 
     voucherOperadoraData: async (
       _: any,
