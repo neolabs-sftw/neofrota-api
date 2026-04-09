@@ -7,19 +7,23 @@ const JWT_SECRET = "MINHA_CHAVE_SECRETA_SUPER_SECRETA";
 
 export const motoristaResolvers = {
   Query: {
+
     motoristas() {
       return prisma.motorista.findMany();
     },
+
     motorista(_: any, args: { id: any }) {
       return prisma.motorista.findUnique({
         where: { id: Number(args.id) },
       });
     },
+
     motoristasAgregados(_: any, { operadoraId }: { operadoraId: any }) {
       return prisma.motorista.findMany({
         where: { tipoMotorista: "Agregado", operadoraId: Number(operadoraId) },
       });
     },
+
     motoristasOperadora(
       _: any,
       args: {
@@ -31,7 +35,6 @@ export const motoristaResolvers = {
       },
     ) {
       let orderByClause = {};
-
       // Converter campo para snake_case para o Prisma
       const fieldMap = {
         nome: "nome",
@@ -59,18 +62,21 @@ export const motoristaResolvers = {
 
   Motorista: {
     id: (obj: Motorista) => String(obj.id),
+
     operadoraId: (obj: Motorista) => {
       if (!obj.operadoraId) return null;
       return prisma.operadora.findUnique({
         where: { id: obj.operadoraId },
       });
     },
+
     vCnh: (obj: Motorista) => {
       if (!obj.vCnh) return null;
       return new Date(obj.vCnh);
     },
+
     statusCnh: (parent: Motorista) => {
-      // Usar o campo vCnh em camelCase
+
       if (!parent.vCnh) {
         return false;
       }
@@ -82,9 +88,11 @@ export const motoristaResolvers = {
 
       return hoje < dataGatilho;
     },
+
     statusMotorista: (parent: Motorista) => {
       return parent.statusMotorista;
     },
+
     dataCriacao: (parent: Motorista) => {
       return parent.dataCriacao
         ? new Date(parent.dataCriacao).toISOString()
@@ -108,7 +116,7 @@ export const motoristaResolvers = {
       return await prisma.motorista.create({
         data: {
           nome,
-          email,
+          email: email.toLowerCase().trim(),
           fotoMotorista,
           cpf,
           cnh,
@@ -118,6 +126,7 @@ export const motoristaResolvers = {
         },
       });
     },
+
     updateMotorista: async (_: any, args: any) => {
       const { vCnh, operadoraId } = args.input;
 
@@ -130,6 +139,7 @@ export const motoristaResolvers = {
         },
       });
     },
+
     deleteMotorista: async (_: any, id: string, email: string) => {
       return prisma.motorista.update({
         where: { id: parseInt(id) },
