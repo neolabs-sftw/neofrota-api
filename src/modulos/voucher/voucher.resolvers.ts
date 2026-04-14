@@ -76,7 +76,7 @@ export const voucherResolvers = {
         adminUsuarioId,
         tipoCorrida,
         natureza,
-        status
+        status,
       } = filtro;
 
       // 1. Lógica para o filtro de datas (De / Até)
@@ -110,7 +110,7 @@ export const voucherResolvers = {
           adminUsuarioId: adminUsuarioId || undefined,
           tipoCorrida: tipoCorrida || undefined,
           natureza: natureza || undefined,
-          status: status || undefined
+          status: status || undefined,
         },
         orderBy: { dataHoraProgramado: "desc" }, // Mais recentes primeiro
         include: {
@@ -125,10 +125,10 @@ export const voucherResolvers = {
             include: {
               configuracoes: {
                 include: {
-                  modelo: true
-                }
-              }
-            }
+                  modelo: true,
+                },
+              },
+            },
           },
           modeloTurno: true,
           rota: true,
@@ -435,6 +435,44 @@ export const voucherResolvers = {
         });
       } catch (error) {
         console.error(error);
+      }
+    },
+
+    editarVouchersEmMassa: async (_: any, { input }: any) => {
+      // Separamos os 'ids' do resto dos dados que serão atualizados
+      const { ids, ...updateData } = input;
+
+      // Validação de segurança para não rodar um update sem WHERE
+      if (!ids || !Array.isArray(ids) || ids.length === 0) {
+        throw new Error("Nenhum voucher selecionado para atualização.");
+      }
+
+      try {
+        // Converte o array de IDs para inteiros
+        const idsParseados = ids.map((id: string | number) =>
+          parseInt(id as string),
+        );
+
+        // Executa o Update em Massa
+        const payload = await prisma.voucher.updateMany({
+          where: {
+            id: { in: idsParseados },
+          },
+          data: {
+            ...updateData,
+            motoristaId: updateData.motoristaId
+              ? BigInt(updateData.motoristaId)
+              : undefined,
+          },
+        });
+
+        // Retorna a contagem de linhas alteradas: { count: number }
+        return payload;
+      } catch (error) {
+        console.error("Erro na edição de vouchers em massa:", error);
+        throw new Error(
+          "Falha na operação. Nenhum voucher foi alterado. Por favor, tente novamente.",
+        );
       }
     },
 

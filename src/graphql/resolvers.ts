@@ -18,6 +18,7 @@ import { pedagioResolvers } from "../modulos/pedagio/pedagio.resolvers";
 import { passageirosResolvers } from "../modulos/passageiros/passageiros.resolvers";
 import { ModeloVoucherTurnoResolvers } from "../modulos/modelo_turno/modelo_turno.resovers";
 import { moduloFinanceiroResolvers } from "../modulos/financeiro/financeiro.resolvers";
+import { lancamentosResolvers } from "../modulos/lancamentos/lancamento.resolvers";
 
 // 2. Colocar todos os resolvers em um array
 const resolversArray = [
@@ -38,6 +39,7 @@ const resolversArray = [
   pedagioResolvers,
   passageirosResolvers,
   moduloFinanceiroResolvers,
+  lancamentosResolvers,
 ];
 
 // 3. Exportar o resultado do merge

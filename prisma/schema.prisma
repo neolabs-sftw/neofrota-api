@@ -16,11 +16,12 @@ model AdminUsuario {
   statusAdminOperadora Boolean?  @default(true) @map("status_admin_operadora")
   dataCriacao          DateTime? @default(now()) @map("data_criacao") @db.Timestamp(6)
 
-  funcao             Funcao?              @default(Oper) @map("funcao")
-  operadora          Operadora?           @relation(fields: [operadoraId], references: [id])
-  modeloVoucherFixo  ModeloVoucherFixo[]
-  modeloVoucherTurno ModeloVoucherTurno[]
-  voucher            Voucher[]
+  funcao               Funcao?               @default(Oper) @map("funcao")
+  operadora            Operadora?            @relation(fields: [operadoraId], references: [id])
+  modeloVoucherFixo    ModeloVoucherFixo[]
+  modeloVoucherTurno   ModeloVoucherTurno[]
+  voucher              Voucher[]
+  lancamentoMotoristas LancamentoMotorista[]
 
   @@map("admin_usuario")
 }
@@ -85,6 +86,7 @@ model Motorista {
   agregadoRelacao        RelacaoAgrdFunc[]         @relation("Agregado")
   funcionarioRelacao     RelacaoAgrdFunc[]         @relation("Funcionario")
   configuracaoViagemFixa ModeloVoucherFixoConfig[]
+  lancamentoMotorista    LancamentoMotorista[]
 
   @@map("motorista")
 }
@@ -162,6 +164,7 @@ model Operadora {
   carro                 Carro[]
   relacaoAgrdFunc       RelacaoAgrdFunc[]
   pedagio               Pedagio[]
+  lancamentoMotoristas  LancamentoMotorista[]
 
   @@map("operadora")
 }
@@ -473,6 +476,28 @@ model Voucher {
   passageiros VoucherPassageiro[]
 
   @@map("voucher")
+}
+
+model LancamentoMotorista {
+  id             Int            @id @default(autoincrement())
+  descricao      String         @map("descricao")
+  valor          Decimal        @map("valor") @db.Decimal(10, 2)
+  tipo           TipoLancamento @map("tipo")
+  dataHora       DateTime       @default(now()) @map("data_hora")
+  motoristaId    BigInt         @map("motorista_id")
+  adminUsuarioId BigInt         @map("admin_usuario_id")
+  operadoraId    BigInt         @map("operadora_id")
+
+  adminUsuario AdminUsuario @relation(fields: [adminUsuarioId], references: [id])
+  motorista    Motorista    @relation(fields: [motoristaId], references: [id])
+  operadora    Operadora    @relation(fields: [operadoraId], references: [id])
+
+  @@map("lancamento_motorista")
+}
+
+enum TipoLancamento {
+  Credito
+  Desconto
 }
 
 enum StatusPresenca {

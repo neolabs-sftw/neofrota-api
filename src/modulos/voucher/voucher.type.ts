@@ -176,7 +176,29 @@ export const voucherTypes = gql`
     status: String
   }
 
-  # Queries (exemplo básico, adicione mais se necessário)
+  type BatchPayload {
+    count: Int!
+  }
+
+  input EditarVouchersEmMassaInput {
+    ids: [ID!]!
+    natureza: String
+    status: String
+    tipoCorrida: String
+    motoristaId: ID
+    dataHoraProgramado: DateTime
+    valorViagem: Float
+    valorDeslocamento: Float
+    valorHoraParada: Float
+    valorViagemRepasse: Float
+    valorDeslocamentoRepasse: Float
+    valorHoraParadaRepasse: Float
+    valorEstacionamento: Float
+    valorPedagio: Float
+    qntTempoParado: Int
+    observacao: String
+  }
+
   extend type Query {
     voucher(id: ID!): Voucher
     vouchers(
@@ -202,5 +224,6 @@ export const voucherTypes = gql`
     criarVouchers(input: [VoucherCreateInput!]!): [Voucher!]!
     editarVoucher(input: VoucherUpdateInput!): Voucher!
     deletarVoucher(id: ID!): Boolean!
+    editarVouchersEmMassa(input: EditarVouchersEmMassaInput!): BatchPayload!
   }
 `;

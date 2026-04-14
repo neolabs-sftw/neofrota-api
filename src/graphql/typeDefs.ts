@@ -1,6 +1,5 @@
-import { mergeTypeDefs } from "@graphql-tools/merge"; 
-import gql from 'graphql-tag';
-
+import { mergeTypeDefs } from "@graphql-tools/merge";
+import gql from "graphql-tag";
 
 // 1. Importar todos os arquivos de types dos seus módulos
 import { operadoraTypes } from "../modulos/operadora/operadoras.types";
@@ -21,11 +20,11 @@ import { passageirosTypes } from "../modulos/passageiros/passageiros.types";
 import { modeloVoucherTurnoTypes } from "../modulos/modelo_turno/modelo_turno.types";
 import { voucherPassageiroTypes } from "../modulos/voucher_passageiro/voucher_passageiro.types";
 import { moduloFinanceiroTypes } from "../modulos/financeiro/financeiro.types";
+import { lancamentoTypes } from "../modulos/lancamentos/lancamento.types";
 // 2. Criar um typeDef base.
 // Essencial para que os "extend type Query" e "extend type Mutation" dos módulos
 // tenham um ponto de partida para se acoplar.
 const baseTypeDefs = gql`
-
   scalar DateTime
 
   type Query {
@@ -57,9 +56,9 @@ const typeDefsArray = [
   pedagioTypes,
   passageirosTypes,
   voucherPassageiroTypes,
-  moduloFinanceiroTypes
+  moduloFinanceiroTypes,
+  lancamentoTypes,
 ];
-
 
 // 4. Exportar o resultado do merge
 export const typeDefs = mergeTypeDefs(typeDefsArray);
